@@ -1,15 +1,19 @@
 ![img](easyminer-header.png)
 
 # **Easy Miner** Documentation 
-> Author:  [**@blacktyg3r**](https://t.me/blacktyg3r), created  with [mkdocs.org](https://www.mkdocs.org).
+
+> Author:  [**@blacktyg3r**](https://t.me/blacktyg3r), created with [mkdocs.org](https://www.mkdocs.org).
 ---
 
+
 **Easy Miner** is a Cross-platform and user-friendly mining manager working 
-with the EPIC Blockchain Protocol. Its job is to set up, run, 
+with the EPIC Blockchain Protocol. Its job is to setup, run, 
 collect feedback from 3rd party software and deliver processed data via API
 to front-end interface (GUI).
+
 ---
-## ABSTRACT
+
+### ABSTRACT
 
 **Easy Minerv3** will continue its mission from the previous versions, that is to deliver an **EPIC mining**
 manager application **easy to use for everyone**. The **EPIC Proof Of Work** polyphasic design unlocks
@@ -53,7 +57,7 @@ Application will **support pool mining** over solo forthe following reasons:
 ```
 ---
 
-## ROADMAP
+### ROADMAP
 Usable beta version is estimated to be finished in **~5 weeks** , this would include following milestones:
 
 ```
@@ -67,7 +71,7 @@ Usable beta version is estimated to be finished in **~5 weeks** , this would inc
 ```
 ---
 
-## TECH STACK
+### TECH STACK
 
 Application back-end will be mostly written with the **Python** programming language using its
 multiple libraries and frameworks. This app should be considered as a manager, its job is to run,
@@ -124,6 +128,4 @@ software, this manager will check them and update whenever needed.
 
 ---
 
-
-
-
+Epic-Cash @ 2022
