@@ -77,7 +77,7 @@ FRONT-END:
 ```
 ---
 
-# Application core parts
+# Application core elements
 - The **Setup-wizard** will provide step-by-step help for the new users, from how to configure mining
 software to making an account at the pool website
 
@@ -113,6 +113,16 @@ software, this manager will check them and update whenever needed.
     - Crypto market stats (from coingecko API)
 #### 7. GUI interface
 
----
 
+---
+## Donations and Support
+Support and donation are welcome, more details via Telegram: [**@blacktyg3r**](https://t.me/blacktyg3r).
+
+- Native EPIC:
+    - Stack Wallet: ```esZ7pubuHN4Dyn8WsCRjzhe12ZtgHqmnthGoopA1iSskm2xwXcKK```
+    - GUI/CLI Wallet: ```https://blacktyg3r.com/pay```
+- VITE Chain:
+    - vite_d3f478a11bb149c4d140ea29dbfceba5b5315c04561d355c12
+
+---
 [epic.tech](https://epic.tech) @ 2022
