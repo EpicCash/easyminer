@@ -92,7 +92,6 @@ other costs for more precise calculations.
 software, this manager will check them and update whenever needed.
 ---
 
-### Easy Miner in details
 #### 1. Hardware and OS detection
 - Collect data:
     - Model and make of GPU 
@@ -122,7 +121,7 @@ Support and donation are welcome, more details via Telegram: [**@blacktyg3r**](h
     - Stack Wallet: ```esZ7pubuHN4Dyn8WsCRjzhe12ZtgHqmnthGoopA1iSskm2xwXcKK```
     - GUI/CLI Wallet: ```https://blacktyg3r.com/pay```
 - VITE Chain:
-    - vite_d3f478a11bb149c4d140ea29dbfceba5b5315c04561d355c12
+    - ```vite_d3f478a11bb149c4d140ea29dbfceba5b5315c04561d355c12```
 
 ---
 [epic.tech](https://epic.tech) @ 2022
