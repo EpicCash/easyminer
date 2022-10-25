@@ -1,11 +1,160 @@
-<div class="container p-4">
+<div class="container">
     <div class="row justify-content-center">
-        < class="div col-sm-12 col-md-8 col-lg-6">
+        <div class="col-sm-12 col-md-8 col-lg-6">
 
-            <div class="card bg-dark p-2">
+            <div class="card bg-dark p-1">
                 <div class="card-header text-center mb-1">
                     <img alt='logo' height="90px" class="img-responsive mb-2" src="https://epic.tech/img/epic-cash-logo.png" />
                 </div>
+
+                <div class="card-body">
+                    <form class="form" method="post">
+
+                        {#  RIG SETUP  #}
+                        <span class="text-muted">Mining Rig</span>
+                        <div class="input-group mb-3 mt-2">
+                            <span class="input-group-text w-25" id="basic-addon1" >Hashrate</span>
+                            <input type="number" class="form-control" required value="1000" id="hashrate"
+                                   aria-label="Rig Hashrate" aria-describedby="basic-addon2" name="hashrate">
+                            <span class="input-group-text" id="basic-addon2">H/s</span>
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <label class="input-group-text w-25" for="algorithm">Algorithm</label>
+                                <select class="form-select" id="algorithm" name="algorithm">
+                                <option selected value="randomx">RandomX (CPU)</option>
+                                <option value="progpow">ProgPoW (GPU)</option>
+                                <option value="cuckoo">Cuckoo (ASIC)</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text w-25" id="basic-addon1">Power Cons.</span>
+                                <input type="number" required class="form-control" placeholder="200W" id="consumption"
+                                       name="consumption" aria-label="consumption" aria-describedby="basic-addon2"
+                                       step="0.5" value="0">
+                                <span class="input-group-text" id="basic-addon2">Watt</span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <input type="button" disabled class="btn btn-outline-success w-100 btn-sm p-0" onclick="" value="Save Rig">
+                            </div>
+                            <div class="col-6">
+                                <input type="button" disabled class="btn btn-outline-success w-100 btn-sm p-0" onclick="" value="Load Rig">
+                            </div>
+                        </div>
+
+                        <hr class="text-muted mt-2 mb-3"/>
+
+                        {#  COSTS SETUP  #}
+                        <span class="text-muted ">Mining Costs</span>
+
+                        <div class="col-12 mt-2">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text w-50" id="basic-addon1" >Energy Unit Price</span>
+                                <input type="number" required class="form-control" placeholder="0.30" id="energy"
+                                       name="energy" aria-label="energy" aria-describedby="basic-addon2" step="0.01" value="0">
+                                <span class="input-group-text" id="basic-addon2">kWh</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="input-group mb-3">
+                                <label class="input-group-text w-50" for="currency">Currency</label>
+                                <select class="form-select" id="currency" name="currency">
+                                    <option selected value="USD">USD</option>
+                                    <option value="GBP">GBP</option>
+                                    <option value="PLN">PLN</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text w-50" id="basic-addon1" >Pool fee</span>
+                                <input type="number" required class="form-control" placeholder="0" id="pool_fee" name="pool_fee"
+                                       aria-label="Pool Fee" aria-describedby="basic-addon2" step="0.1" value="0">
+                                <span class="input-group-text" id="basic-addon2">%</span>
+                            </div>
+                        </div>
+                    </form>
+
+                    <button type="button" class="btn btn-success w-100 my-3" onclick="submitForm()"
+{#                            data-bs-toggle="modal" data-bs-target="#calculationsModal" #}
+                            id="calculateButton">
+                        Calculate
+                    </button>
+
+                    <div class="bg-light rounded text-dark text-start mt-2">
+                        <span id="responseArea"></span>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <div class="small text-muted mt-0">Powered by
+                        <a target="_blank" href="epic-radar.com/api">epic-radar.com/api</a>
+                        | <a href="https://blacktyg3r.com" target="_blank">blacktyg3r.com</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="calculationsModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-sm bg-dark text-white">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="modalTitle">Modal title</h1>
+                <button type="button" class="btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="calculationsBody">
+        ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+async function submitForm() {
+        const button = $("#calculateButton")
+        button.prop("disabled", true);
+        button.html(`<div class="spinner-border spinner-border-sm" role="status"></div> Calculating ..`);
+
+        const body = {
+            "hashrate": document.getElementById("hashrate").value,
+            "algorithm": document.getElementById("algorithm").value,
+            "currency": document.getElementById("currency").value,
+            "pool_fee": document.getElementById("pool_fee").value,
+            "energy": document.getElementById("energy").value,
+            "consumption": document.getElementById("consumption").value
+        }
+
+
+            console.log(await apiCall(body, '/calculate', "calculationsBody", "POST"))
+            {#document.getElementById("heightText").innerHTML = data.height#}
+            {#document.getElementById("algoIcon").innerHTML = data.algo.icon#}
+            {#document.getElementById("algoText").innerHTML = data.algo.text#}
+            {#document.getElementById("deltaText").innerHTML = data.delta#}
+            button.prop("disabled", false);
+            button.html(`<div>Calculate</div>`);
+
+
+
+
+
+    }
+</script>
+
+
 {#                <div class="card-header text-center p-1">#}
 {#                    <table class="table table-small text-white table-borderless mb-1 mt-1" >#}
 {#                        <thead class="">#}
@@ -37,115 +186,7 @@
 {#                        </tbody>#}
 {#                    </table>#}
 {#                </div>#}
-                <div class="card-body">
 
-                    <form class="form" method="post">
-                        {#  RIG SETUP  #}
-                        <span class="h2 text-light">I Rig Details</span>
-                            <div class="my-4">
-                                <div class="input-group mb-3">
-                                    <span class="input-group-text w-25" id="basic-addon1" >Hashrate</span>
-                                    <input type="number" class="form-control" required value="1000" id="hashrate"
-                                           aria-label="Rig Hashrate" aria-describedby="basic-addon2" name="hashrate">
-                                    <span class="input-group-text" id="basic-addon2">H/s</span>
-                                </div>
-
-                                <div class="input-group mb-3">
-                                    <label class="input-group-text w-25" for="algorithm">Algorithm</label>
-                                        <select class="form-select" id="algorithm" name="algorithm">
-                                        <option selected value="randomx">RandomX (CPU)</option>
-                                        <option value="progpow">ProgPoW (GPU)</option>
-                                        <option value="cuckoo">Cuckoo (ASIC)</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-12">
-                                    <div class="input-group mb-3">
-                                        <span class="input-group-text w-25" id="basic-addon1">Power Cons.</span>
-                                        <input type="number" required class="form-control" placeholder="200W" id="consumption"
-                                               name="consumption" aria-label="consumption" aria-describedby="basic-addon2"
-                                               step="0.5" value="0">
-                                        <span class="input-group-text" id="basic-addon2">Watt</span>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-6">
-                                        <input type="button" disabled class="btn btn-success w-100 btn-sm p-1" onclick="" value="Save Rig">
-                                    </div>
-                                    <div class="col-6">
-                                        <input type="button" disabled class="btn btn-success w-100 btn-sm p-1" onclick="" value="Load Rig">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-12">
-                                <div class="input-group mb-3">
-                                    <span class="input-group-text w-50" id="basic-addon1" >Energy Unit Price</span>
-                                    <input type="number" required class="form-control" placeholder="0.30" id="energy"
-                                           name="energy" aria-label="energy" aria-describedby="basic-addon2" step="0.01" value="0">
-                                    <span class="input-group-text" id="basic-addon2">kWh</span>
-                                </div>
-                            </div>
-
-                            <div class="col-12">
-                                <div class="input-group mb-3">
-                                    <label class="input-group-text w-50" for="currency">Currency</label>
-                                        <select class="form-select" id="currency" name="currency">
-                                            <option selected value="USD">USD</option>
-                                            <option value="GBP">GBP</option>
-                                            <option value="PLN">PLN</option>
-                                        </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <div class="input-group mb-3">
-                                            <span class="input-group-text w-50" id="basic-addon1" >Pool fee</span>
-                                            <input type="number" required class="form-control" placeholder="0" id="pool_fee" name="pool_fee"
-                                                   aria-label="Pool Fee" aria-describedby="basic-addon2" step="0.1" value="0">
-                                            <span class="input-group-text" id="basic-addon2">%</span>
-                                        </div>
-                                    </div>
-                                </form>
-                </div>
-                        </div>
-
-                        <input type="button" class="btn btn-outline-success w-100 my-3"
-                               onclick="submitForm()" value="Calculate">
-
-                    <div class="bg-light rounded text-dark text-start mt-2">
-                        <span id="responseArea"></span>
-                    </div>
-                </div>
-
-                <div class="card-footer text-center">
-                    <div class="text-muted mt-0">Powered by
-                        <a target="_blank" href="epic-radar.com/api">epic-radar.com/api</a>
-                        | <a href="https://blacktyg3r.com" target="_blank">blacktyg3r.com</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-</div>
-
-
-<script>
-    function submitForm() {
-        const body = {
-            "hashrate": document.getElementById("hashrate").value,
-            "algorithm": document.getElementById("algorithm").value,
-            "currency": document.getElementById("currency").value,
-            "pool_fee": document.getElementById("pool_fee").value,
-            "energy": document.getElementById("energy").value,
-            "consumption": document.getElementById("consumption").value
-           }
-        console.log(body)
-        apiCall(body, '/calculate', "responseArea", "POST");
-    }
-</script>
 {##}
 {##}
 {#<div class="input-group mb-3">#}
