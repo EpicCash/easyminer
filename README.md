@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="frontend/static/easyminer-header.png">
+  <img src="frontend/static/img/easyminer-header.png">
 </p>
 
 > Author:  [**@blacktyg3r**](https://t.me/blacktyg3r), created with [mkdocs.org](https://www.mkdocs.org).
