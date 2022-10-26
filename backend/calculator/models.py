@@ -7,12 +7,12 @@ from datetime import datetime as dtime
 
 from pydantic import BaseModel, Field, validator
 
-DECIMAL = 10 ** 8
-HALVINGS = [1157760, 1224000, 2275200]
-BLOCK_TIME = 60
-ALGORITHMS = ['cuckoo', 'progpow', 'randomx']
-BLOCKS_PER_DAY = 86400 / BLOCK_TIME
-ALGORITHM_PERCENTAGE = {'cuckoo': 0.4, 'progpow': 0.48, 'randomx': 0.48}
+from . import (
+    ALGORITHMS,
+    BLOCK_TIME,
+    BLOCKS_PER_DAY,
+    ALGORITHM_PERCENTAGE
+    )
 
 
 class Rig(BaseModel):
@@ -63,24 +63,24 @@ class Currency(BaseModel):
 
 class Report(BaseModel):
     rig: Rig | None = Field(...)
-    currency: str | None = Field(None, title='Base Currency Used in Calculations')
-    epic_per_day: float | None = Field(None, title='Yield in EPIC within 24H')
-    blocks_per_day: float | None = Field(None, title='Mined Blocks in 24H')
-    hours_for_block: float | None = Field(None, title='Hours Needed to Mine a Block')
-    costs: float | None = Field(None, title='Total Costs in EPIC for 24H')
-    cost_pool: float | None = Field(None, title='Pool Fee in EPIC for 24H')
-    cost_energy: float | None = Field(None, title='Energy Cost in Currency for 24H')
-    yield_value: float | None = Field(None, title='Value of Yield in Currency for 24H')
-    profit: float | None = Field(None, title='Profit in Currency for 24H')
+    currency: str | None = Field(..., title='Currency Used in Calculations')
+    coins_per_day: list[str, float] | None = Field([None, 0], title='Yield in EPIC within 24H')
+    blocks_per_day: list[str, float] | None = Field([None, 0], title='Mined Blocks in 24H')
+    hours_for_one_block: list[str, float] | None = Field([None, 0], title='Hours Needed to Mine One Block')
+    cost_energy: list[str, float] | None = Field([None, 0], title='Energy Cost in Currency for 24H')
+    cost_pool: list[str, float] | None = Field([None, 0], title='Pool Fee in EPIC for 24H')
+    cost_total: list[str, float] | None = Field([None, 0], title='Total Costs in EPIC for 24H')
+    value_per_day: list[str, float] | None = Field([None, 0], title='Value of Yield in Currency for 24H')
+    profit_per_day: list[str, float] | None = Field([None, 0], title='Profit in Currency for 24H')
 
     def formatted(self):
         return \
             f"""
             REPORT FOR '{self.rig.name}' | PoW: '{self.rig.algorithm.upper()}'  
             HASHRATE: {self.rig.formatted_hashrate()}
-            24H YIELD: {self.epic_per_day} EPIC | {round(self.yield_value, 3)} {self.currency}
-            24H COSTS: {round(self.costs, 3)} {self.currency}
-            24H PROFIT: {round(self.profit, 3)} {self.currency}
+            24H YIELD: {self.coins_per_day[1]} EPIC | {round(float(self.value_per_day[1]), 3)} {self.currency}
+            24H COSTS: {round(float(self.cost_total[1]), 3)} {self.currency}
+            24H PROFIT: {round(float(self.profit_per_day[1]), 3)} {self.currency}
             """
 
 
@@ -125,7 +125,7 @@ class Calculator(BaseModel):
             epic_amount = rig_blocks_per_day * miners_reward
 
             response = {
-                '24h': round(epic_amount, 8),
+                'per_day': round(epic_amount, 8),
                 'block_reward': miners_reward,
                 'blocks_per_day': round(rig_blocks_per_day, 3),
                 'hours_for_block': round(hours_for_block, 1),
@@ -134,16 +134,16 @@ class Calculator(BaseModel):
 
             return response
 
-    def pool_cost(self) -> dict:
+    def pool_cost(self) -> list:
         """return pool_cost for 24h in EPIC"""
         if self.pool_fee:
-            fee = self.raw_yield()['24h'] * (self.pool_fee / 100)
+            fee = self.raw_yield()['per_day'] * (self.pool_fee / 100)
         else:
             fee = 0
 
-        return {'symbol': 'EPIC', 'value': fee}
+        return ['EPIC',  fee]
 
-    def energy_cost(self) -> dict:
+    def energy_cost(self) -> list:
         """return energy_cost for 24h in given currency (default USD)"""
         if self.electricity_cost and self.rig.power_consumption is not None:
             mining_time = 24 * ALGORITHM_PERCENTAGE[self.rig.algorithm]
@@ -151,37 +151,46 @@ class Calculator(BaseModel):
             cost = mining_time * mining_cost
         else:
             cost = 0
+        return [self.currency.symbol, cost]
 
-        return {'symbol': self.currency.symbol, 'value': cost}
+    def total_cost(self) -> list:
+        cost = self.pool_cost()[1] * self.currency.epic_price + self.energy_cost()[1]
+        return [self.currency.symbol, cost]
 
     def income(self, time_in_days: int = 1):
-        return {'symbol': self.currency.symbol, 'value': self.currency.epic_price * self.raw_yield()['24h'] * time_in_days}
+        day_income = (self.raw_yield()['per_day'] - self.pool_cost()[1]) * self.currency.epic_price
+        return [self.currency.symbol, day_income * time_in_days]
 
-    def profit(self):
-        currency_yield_value = (self.raw_yield()['24h'] - self.pool_cost()['value']) * self.currency.epic_price
-        currency_rig_profit = currency_yield_value - self.energy_cost()['value']
-        return {'symbol': self.currency.symbol, 'value': currency_rig_profit}
+    def profit(self, time_in_days: int = 1):
+        currency_yield_value = (self.raw_yield()['per_day'] - self.pool_cost()[1]) * self.currency.epic_price
+        currency_rig_profit = currency_yield_value - self.energy_cost()[1]
+        return [self.currency.symbol, currency_rig_profit * time_in_days]
 
     def get_report(self, as_dict: bool = True):
         raw_yield = self.raw_yield()
+        coins_per_day = ['EPIC', raw_yield['per_day']]
+        blocks_per_day = ['block', raw_yield['blocks_per_day']]
+        hours_for_one_block = ['hour', raw_yield['hours_for_block']]
+
         data = {
             'rig': self.rig,
             'currency': self.currency.symbol,
 
-            'epic_per_day': raw_yield['24h'],
-            'blocks_per_day': raw_yield['blocks_per_day'],
-            'hours_for_block': raw_yield['hours_for_block'],
+            'coins_per_day': coins_per_day,
+            'value_per_day': self.income(),
+            'blocks_per_day': blocks_per_day,
+            'hours_for_one_block': hours_for_one_block,
 
-            'costs': self.pool_cost()['value'] * self.currency.epic_price + self.energy_cost()['value'],
-            'cost_pool': self.pool_cost()['value'],
-            'cost_energy': self.energy_cost()['value'],
+            'cost_energy': self.energy_cost(),
+            'cost_pool': self.pool_cost(),
+            'cost_total': self.total_cost(),
 
-            'profit': self.profit()['value'],
-            'yield_value': self.income()['value'],
+            'profit_per_day': self.profit()
             }
 
         if as_dict:
-            return Report(**data).dict(exclude={'blockchain'})
+            print(data)
+            return Report(**data).dict()
         else:
             return Report(**data)
 
@@ -226,7 +235,7 @@ class Parser(BaseModel):
         if any(x in self.query for x in self._PATTERNS['mining_algorithms']['cuckoo']):
             algo = 'cuckoo'
 
-        self.algo = algo
+        self.algorithm = algo
 
     def _units(self, source=None):
         """Find what kind of unit is provided and save"""
@@ -275,7 +284,7 @@ class Parser(BaseModel):
                     self.unit = 'hash'
                     # print('No unit found in message, using H/s')
 
-            hashrate = value * self.get_units()[1]
+            hashrate = int(value * self.get_units()[1])
             print(f"PARSED HASHRATE: {value} UNIT: {self.unit} ({hashrate} H/s)")
             self.hashrate = hashrate
         else:

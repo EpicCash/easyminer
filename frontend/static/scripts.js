@@ -6,6 +6,28 @@
 //     } catch (error) {}
 // });
 
+let rotation1 = 0;
+let rotation2 = 0;
+
+jQuery.fn.rotate = function(degrees) {
+    $(this).css({'-webkit-transform' : 'rotate('+ degrees +'deg)',
+                 '-moz-transform' : 'rotate('+ degrees +'deg)',
+                 '-ms-transform' : 'rotate('+ degrees +'deg)',
+                 'transform' : 'rotate('+ degrees +'deg)'});
+};
+
+$(document).ready(function(){
+    $("#headingOne").click(function(){
+        rotation1 += 180;
+        $("#costsIcon").rotate(rotation1);
+    });
+    $("#headingTwo").click(function(){
+        rotation2 += 180;
+        $("#rigIcon").rotate(rotation2);
+    });
+});
+
+
 function keep_alive_server() {
     fetch(document.location + "keep-alive/?alive=true", {
         method: 'GET',
@@ -31,6 +53,7 @@ function apiCall(body, query, cbFieldId, method='POST') {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(body),
-    }).then(response => response.text())
+    }).then(response => response.text()
+    ).catch(err => console.log(err))
 
 }
