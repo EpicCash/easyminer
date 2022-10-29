@@ -9,9 +9,12 @@
                          <img alt='logo' class="img-responsive mb-2" src="{{ url_for('static', path='img/epic-cash-logo.png') }}" />
                     </div>
                     <div class="col-8 text-end">
-                        <span class="h3 text-light">
-                            MINING CALCULATOR
-                        </span>
+                        <p class="fs-6 text-muted mb-0 fw-bold">
+                            EASY MINER <sup>v3</sup>
+                        </p>
+                        <p class="h2 text-light">
+                            CALCULATOR
+                        </p>
                     </div>
                 </div>
 
@@ -138,8 +141,29 @@
                         <span class="h3 mt-2" >Calculate</span>
                     </button>
 
-                    <div class="bg-light rounded text-dark text-start mt-2">
-                        <span id="responseArea"></span>
+                    {#  Calculations Result #}
+                    <div class="accordion" id="resultAccordion" hidden>
+                        <div class="accordion-item bg-dark border-0">
+                            <div class="accordion-header h3" id="headingThree">
+                                <div class="row mx-0 py-2 px-2 shadow-sm rounded-2" data-bs-toggle="collapse"
+                                     data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree"
+                                     style="color: #badce3; background: conic-gradient(from 315deg at 80% 60%, #5ba3a8, #4c929b, #306d7e, #1b4a61, #133c54);">
+                                    <div class="col-9 text-start">
+                                        Result
+                                    </div>
+                                    <div class="col-3 text-end text-dark">
+                                        <span class="material-icons fs-1" id="resultIcon">expand_less</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="collapseThree" class="accordion-collapse collapse show border-0"
+                                 aria-labelledby="headingThree" data-bs-parent="#resultAccordion">
+                                <div class="accordion-body px-0 py-1">
+                                    <span class="text-light" id="responseArea"></span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="card-footer text-center">
@@ -168,18 +192,24 @@ async function submitForm() {
             "consumption": document.getElementById("consumption").value
         }
 
-
-            console.log(await apiCall(body, '/calculate', "calculationsBody", "POST"))
-            {#document.getElementById("heightText").innerHTML = data.height#}
-            {#document.getElementById("algoIcon").innerHTML = data.algo.icon#}
-            {#document.getElementById("algoText").innerHTML = data.algo.text#}
-            {#document.getElementById("deltaText").innerHTML = data.delta#}
-            button.prop("disabled", false);
-            button.html(`<span class="h3" >Calculate</span>`);
+        const data = await apiCall(body, '/calculate', "POST")
+        console.log(data)
+        button.prop("disabled", false);
+        button.html(`<span class="h3">Calculate</span>`);
 
 
+        if ($("#collapseOne").hasClass("show")) {
+            $("#headingOne").click();
+            $("#collapseOne").removeClass("show");
+        }
 
+        if ($("#collapseTwo").hasClass("show")) {
+            $("#headingTwo").click();
+            $("#collapseTwo").removeClass("show");
+        }
 
+        $("#resultAccordion").attr("hidden", false);
+        $("#responseArea").html(data.coins_per_day[1]);
 
     }
 </script>

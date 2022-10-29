@@ -6,15 +6,17 @@
 //     } catch (error) {}
 // });
 
-let rotation1 = 0;
-let rotation2 = 0;
-
 jQuery.fn.rotate = function(degrees) {
     $(this).css({'-webkit-transform' : 'rotate('+ degrees +'deg)',
                  '-moz-transform' : 'rotate('+ degrees +'deg)',
                  '-ms-transform' : 'rotate('+ degrees +'deg)',
                  'transform' : 'rotate('+ degrees +'deg)'});
 };
+
+// Accordion buttons animation
+let rotation1 = 0;
+let rotation2 = 0;
+let rotation3 = 0;
 
 $(document).ready(function(){
     $("#headingOne").click(function(){
@@ -24,6 +26,10 @@ $(document).ready(function(){
     $("#headingTwo").click(function(){
         rotation2 += 180;
         $("#rigIcon").rotate(rotation2);
+    });
+    $("#headingThree").click(function(){
+        rotation3 += 180;
+        $("#resultIcon").rotate(rotation3);
     });
 });
 
@@ -39,13 +45,12 @@ function keep_alive_server() {
             document.getElementById("algoIcon").innerHTML = data.algo.icon
             document.getElementById("algoText").innerHTML = data.algo.text
             document.getElementById("deltaText").innerHTML = data.delta
-
         })
         .catch(error => {console.error(error)});
     }
 
 
-function apiCall(body, query, cbFieldId, method='POST') {
+function apiCall(body, query, method='POST') {
     return fetch(query, {
         method: method,
         headers: {
@@ -53,7 +58,7 @@ function apiCall(body, query, cbFieldId, method='POST') {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(body),
-    }).then(response => response.text()
+    }).then(response => response.json()
     ).catch(err => console.log(err))
 
 }
