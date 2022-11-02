@@ -35,11 +35,15 @@ async def root(request: Request):
 
 @app.post("/calculate")
 async def calculate(parser: Parser):
-    rig = Rig(**parser.dict(include={'hashrate', 'algorithm'}))
+    parser.parse()
+    print(parser)
+    rig = Rig(**parser.dict(include={'hashrate', 'algorithm', 'power_consumption'}))
     currency = Currency(**provider.MarketData().get(parser.currency))
     blockchain = Blockchain(**provider.BlockchainData().get_last_block())
-    calc = Calculator(rig=rig, blockchain=blockchain, currency=currency, pool_fee=parser.pool_fee)
-    print(calc.get_report(as_dict=False).formatted())
+    calc = Calculator(rig=rig, blockchain=blockchain, currency=currency,
+                      pool_fee=parser.pool_fee, energy_price=parser.energy_price)
+    print(calc)
+    # print(calc.get_report(as_dict=False).formatted())
     return calc.get_report()
 
 # @app.get('/keep-alive/')
