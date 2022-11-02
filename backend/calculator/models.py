@@ -19,7 +19,7 @@ class Rig(BaseModel):
     name: str = 'Default Rig'
     hashrate: int | None = Field(..., title='Rig Hashrate in H/s')
     algorithm: str | None = Field(..., title='PoW Algorithm (randomx, progpow, cuckoo)')
-    power_consumption: int | None = Field(None, title='Rig power consumption in Watts', gt=0, lt=1_000_0000)
+    power_consumption: int | None = Field(None, title='Rig power consumption in Watts', lt=1_000_0000)
 
     @validator('algorithm')
     def valid_algo(cls, v):
@@ -92,7 +92,7 @@ class Calculator(BaseModel):
     currency: Currency | None = Field(..., title='Base Currency, i.e. USD')
     pool_fee: float | None = Field(None, title='Pool Fee as Percentage')
     blockchain: Blockchain
-    electricity_cost: float | None = Field(None, title='Electricity Cost for 1 kW/h')
+    energy_price: float | None = Field(None, title='Electricity Cost for 1 kW/h')
 
     def network_hashrate(self) -> int:
         temp_hashrate = self.blockchain.network_hashrate[self.rig.algorithm]
@@ -145,9 +145,9 @@ class Calculator(BaseModel):
 
     def energy_cost(self) -> list:
         """return energy_cost for 24h in given currency (default USD)"""
-        if self.electricity_cost and self.rig.power_consumption is not None:
+        if self.energy_price and self.rig.power_consumption is not None:
             mining_time = 24 * ALGORITHM_PERCENTAGE[self.rig.algorithm]
-            mining_cost = (self.rig.power_consumption / 1000) * self.electricity_cost
+            mining_cost = (self.rig.power_consumption / 1000) * self.energy_price
             cost = mining_time * mining_cost
         else:
             cost = 0
@@ -200,11 +200,11 @@ class Parser(BaseModel):
     query: str | None = Field(None, title="Query message to parse hashrate from.")
     unit: str | None = Field(None, title="Parsed Hashrate Unit")
     pool_fee: int | None = Field(0, title="Mining Pool fee in %")
-    hashrate: int | None = Field(None, title="Parsed Hashrate in H/s")
+    hashrate: int | float | None = Field(None, title="Parsed Hashrate in H/s")
     currency: str | None = Field(None, title="Parsed Currency")
     algorithm: str | None = Field(None, title="Parsed PoW Algorithm")
-    consumption: float | int = Field(None, title="Parsed Energy Consumption in Watts")
-    energy: float | int = Field(None, title="Parsed Energy Unit Price in Currency")
+    power_consumption: float | int = Field(None, title="Parsed Energy Consumption in Watts")
+    energy_price: float | int = Field(None, title="Parsed Energy Unit Price in Currency")
 
     _PATTERNS = {
         'mining_algorithms': {
@@ -213,7 +213,7 @@ class Parser(BaseModel):
             'cuckoo': ('cu', 'ck', 'co', 'cuckoo', 'Cuckoo', 'CUCKOO')
             },
         'units': {
-            'hash': ('h', 'H'),
+            # 'hash': ('h', 'H'),
             'kilohash': ('kh', 'Kh', 'KH'),
             'megahash': ('mh', 'Mh', 'MH'),
             'gigahash': ('gh', 'Gh', 'GH')
@@ -225,14 +225,16 @@ class Parser(BaseModel):
             query = str(query)
         return query.split(' ')
 
-    def get_algo(self):
+    def get_algo(self, query=None):
         """Find what kind of algorithm is provided and save"""
+        if self.algorithm: return
+
         algo = None
-        if any(x in self.query for x in self._PATTERNS['mining_algorithms']['progpow']):
+        if any(x in query for x in self._PATTERNS['mining_algorithms']['progpow']):
             algo = 'progpow'
-        if any(x in self.query for x in self._PATTERNS['mining_algorithms']['randomx']):
+        if any(x in query for x in self._PATTERNS['mining_algorithms']['randomx']):
             algo = 'randomx'
-        if any(x in self.query for x in self._PATTERNS['mining_algorithms']['cuckoo']):
+        if any(x in query for x in self._PATTERNS['mining_algorithms']['cuckoo']):
             algo = 'cuckoo'
 
         self.algorithm = algo
@@ -260,10 +262,18 @@ class Parser(BaseModel):
 
     def get_hashrate(self):
         """Find rig hashrate given by user and return it"""
-        if isinstance(self.hashrate, int) and self.hashrate > 1:
-            self.unit = 'hash'
-            print(f'{self.hashrate} provided in H/s')
-            print(self)
+        if isinstance(self.hashrate, (int, float)) and self.hashrate > 0:
+            if not self.unit:
+                self.unit = 'hash'
+                print(f'no units, {self.unit}')
+                print(f'{self.hashrate} {self.get_units()[0]} ({self.unit})')
+
+            else:
+                print(f'found units: {self.unit}')
+                self._units(source=[self.unit])
+                print(f'{self.hashrate} {self.get_units()[0]} ({self.unit})')
+                self.hashrate = int(self.hashrate * self.get_units()[1])
+
             return
 
         pat = re.compile(r"\d*\.?\d+|[-+]?\d+")
@@ -290,8 +300,10 @@ class Parser(BaseModel):
         else:
             print(f'No hashrate found in {self.query}')
 
-    def result(self) -> dict:
-        """Update parsed data and return as dict"""
+    def parse(self) -> None:
+        """Update parsed data"""
         self.get_algo()
         self.get_hashrate()
+
+    def result(self) -> dict:
         return self.dict()

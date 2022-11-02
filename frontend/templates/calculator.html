@@ -6,17 +6,35 @@
             <div class="card bg-dark p-1">
                 <div class="row align-items-center card-header mb-1">
                     <div class="col-4">
-                         <img alt='logo' class="img-responsive mb-2" src="{{ url_for('static', path='img/epic-cash-logo.png') }}" />
+{#                      <img alt='logo' class="img-responsive mb-2" src="{{ url_for('static', path='img/epic-cash-logo.png') }}" />#}
+                        <img src="{{ url_for('static', path='img/logo-horizontal-500px-dark.png') }}"
+                             alt='logo' class="img-responsive mb-2 mt-1" height="54">
                     </div>
                     <div class="col-8 text-end">
-                        <p class="fs-6 text-muted mb-0 fw-bold">
-                            EASY MINER <sup>v3</sup>
-                        </p>
-                        <p class="h2 text-light">
+                        <p class="h2 text-light mt-1">
                             CALCULATOR
                         </p>
+                        <p class="fs-7 text-muted my-0">
+                            version 3.0.0
+                        </p>
+
                     </div>
                 </div>
+{##}
+{#                <div class="row justify-items-center text-center text-muted fw-bold">#}
+{#                    <div class="col-3">Day</div>#}
+{#                    <div class="col-1">/</div>#}
+{#                    <div class="col-3">Week</div>#}
+{#                    <div class="col-1">/</div>#}
+{#                    <div class="col-4">Month</div>#}
+{#                </div>#}
+{#                <div class="row justify-items-center text-center text-white px-2">#}
+{#                    <div class="col-3">0.021232</div>#}
+{#                    <div class="col-1"></div>#}
+{#                    <div class="col-3">0.141232</div>#}
+{#                    <div class="col-1"></div>#}
+{#                    <div class="col-3">0.541232</div>#}
+{#                </div>#}
 
                 <div class="card-body">
                     <form class="form" method="post">
@@ -39,29 +57,49 @@
                                 <div id="collapseTwo" class="accordion-collapse collapse show border-0"
                                      aria-labelledby="headingTwo" data-bs-parent="#rigAccordion">
                                     <div class="accordion-body px-0 py-1">
-                                        <div class="input-group mb-3 mt-2">
-                                            <span class="input-group-text w-25" id="basic-addon1" >Hashrate</span>
-                                            <input type="number" class="form-control" required value="1000" id="hashrate"
-                                                   aria-label="Rig Hashrate" aria-describedby="basic-addon2" name="hashrate">
-                                            <span class="input-group-text" id="basic-addon2">H/s</span>
-                                        </div>
 
-                                        <div class="input-group mb-3">
-                                            <label class="input-group-text w-25" for="algorithm">Algorithm</label>
-                                                <select class="form-select" id="algorithm" name="algorithm">
+                                        <div class="input-group mb-3 mt-2">
+                                            <label class="input-group-text input-start" for="algorithmSelect">
+                                                <small>Algorithm</small>
+                                            </label>
+                                                <select class="form-select" id="algorithmSelect" name="algorithm">
                                                 <option selected value="randomx">RandomX (CPU)</option>
                                                 <option value="progpow">ProgPoW (GPU)</option>
                                                 <option value="cuckoo">Cuckoo (ASIC)</option>
                                             </select>
+                                            <span class="input-group-text input-end" id="basic-addon2">
+                                                <span class="material-icons" id="algoIcon">memory</span>
+                                            </span>
+                                        </div>
+
+{#                                        <button type="button" class="btn btn-success btn-sm"#}
+{#                                                onClick="toast('success', 'lol')">#}
+{#                                            dasdsa#}
+{#                                        </button>#}
+
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text input-start" id="basic-addon1">
+                                                <small>Hashrate</small>
+                                            </span>
+                                            <input type="number" class="form-control" required value="10" id="hashrate"
+                                                   aria-label="Rig Hashrate" aria-describedby="basic-addon2"
+                                                   name="hashrate" step="0.1">
+                                            <span class="input-group-text input-end" id="basic-addon2">
+                                                <small id="hashrateUnits">KH/s</small>
+                                            </span>
                                         </div>
 
                                         <div class="col-12">
-                                            <div class="input-group mb-3">
-                                                <span class="input-group-text w-25" id="basic-addon1">Power Cons.</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text input-start" id="basic-addon1">
+                                                    <small>Power Cons.</small>
+                                                </span>
                                                 <input type="number" required class="form-control" placeholder="200W" id="consumption"
                                                        name="consumption" aria-label="consumption" aria-describedby="basic-addon2"
                                                        step="0.5" value="0">
-                                                <span class="input-group-text" id="basic-addon2">Watt</span>
+                                                <span class="input-group-text input-end" id="basic-addon2">
+                                                    <small>Watt</small>
+                                                </span>
                                             </div>
                                         </div>
 
@@ -101,30 +139,45 @@
                                     <div class="accordion-body px-0 py-1">
                                         <div class="col-12 mt-2">
                                             <div class="input-group mb-3">
-                                                <span class="input-group-text w-50" id="basic-addon1" >Energy Unit Price</span>
-                                                <input type="number" required class="form-control" placeholder="0.30" id="energy"
-                                                       name="energy" aria-label="energy" aria-describedby="basic-addon2" step="0.01" value="0">
-                                                <span class="input-group-text" id="basic-addon2">kWh</span>
+                                                <span class="input-group-text input-start" id="basic-addon1">
+                                                    <small>Energy Price</small>
+                                                </span>
+                                                <input type="number" required class="form-control" value="0.30" id="energy"
+                                                       name="energy" aria-label="energy" aria-describedby="basic-addon2" step="0.01">
+                                                <span class="input-group-text input-end" id="basic-addon2">
+                                                    <small>kWh</small>
+                                                </span>
                                             </div>
                                         </div>
-
                                         <div class="col-12">
                                             <div class="input-group mb-3">
-                                                <label class="input-group-text w-50" for="currency">Currency</label>
-                                                <select class="form-select" id="currency" name="currency">
+                                                <label class="input-group-text input-start" for="currencySelect">
+                                                    <small>Currency</small>
+                                                </label>
+                                                <select class="form-select" id="currencySelect" name="currency">
                                                     <option selected value="USD">USD</option>
                                                     <option value="GBP">GBP</option>
                                                     <option value="PLN">PLN</option>
+                                                    <option value="EUR">EUR</option>
+                                                    <option value="CNY">CNY</option>
                                                 </select>
+                                                <span class="input-group-text input-end" id="basic-addon2">
+                                                    <img src="{{ url_for('static', path='img/flags/us.svg') }}"
+                                                         alt='currency-flag' class="m-0 rounded" height="23" id="flagIcon">
+                                                </span>
                                             </div>
                                         </div>
 
                                         <div class="col-12">
-                                            <div class="input-group mb-3">
-                                                <span class="input-group-text w-50" id="basic-addon1" >Pool fee</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text input-start" id="basic-addon1">
+                                                    <small>Pool fee</small>
+                                                </span>
                                                 <input type="number" required class="form-control" placeholder="0" id="pool_fee" name="pool_fee"
                                                        aria-label="Pool Fee" aria-describedby="basic-addon2" step="0.1" value="0">
-                                                <span class="input-group-text" id="basic-addon2">%</span>
+                                                <span class="input-group-text input-end" id="basic-addon2">
+                                                    <small>%</small>
+                                                </span>
                                             </div>
                                         </div>
 
@@ -144,13 +197,14 @@
                     {#  Calculations Result #}
                     <div class="accordion" id="resultAccordion" hidden>
                         <div class="accordion-item bg-dark border-0">
-                            <div class="accordion-header h3" id="headingThree">
+                            <div class="accordion-header" id="headingThree">
                                 <div class="row mx-0 py-2 px-2 shadow-sm rounded-2" data-bs-toggle="collapse"
                                      data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree"
                                      style="color: #badce3; background: conic-gradient(from 315deg at 80% 60%, #5ba3a8, #4c929b, #306d7e, #1b4a61, #133c54);">
-                                    <div class="col-9 text-start">
+                                    <div class="col-9 text-start h3">
                                         Result
                                     </div>
+
                                     <div class="col-3 text-end text-dark">
                                         <span class="material-icons fs-1" id="resultIcon">expand_less</span>
                                     </div>
@@ -159,7 +213,7 @@
 
                             <div id="collapseThree" class="accordion-collapse collapse show border-0"
                                  aria-labelledby="headingThree" data-bs-parent="#resultAccordion">
-                                <div class="accordion-body px-0 py-1">
+                                <div class="accordion-body px-2 py-2">
                                     <span class="text-light" id="responseArea"></span>
                                 </div>
                             </div>
@@ -168,8 +222,8 @@
                 </div>
                 <div class="card-footer text-center">
                     <div class="small text-muted mt-0">Powered by
-                        <a target="_blank" href="https://epic-radar.com/api">epic-radar.com/api</a>
-                        | <a href="https://blacktyg3r.com" target="_blank">blacktyg3r.com</a>
+                        <a target="_blank" class="mx-1" href="https://epic-radar.com/api">EPIC-RADAR<sup><small>TM</small></sup></a>
+                        | <a class="mx-1" href="https://blacktyg3r.com" target="_blank">blacktyg3r.com</a>
                     </div>
                 </div>
             </div>
@@ -184,13 +238,16 @@ async function submitForm() {
         button.html(`<span class="spinner-border" role="status"></span>`);
 
         const body = {
+            "unit": document.getElementById("hashrateUnits").innerHTML,
             "hashrate": document.getElementById("hashrate").value,
-            "algorithm": document.getElementById("algorithm").value,
-            "currency": document.getElementById("currency").value,
+            "algorithm": document.getElementById("algorithmSelect").value,
+            "currency": document.getElementById("currencySelect").value,
             "pool_fee": document.getElementById("pool_fee").value,
-            "energy": document.getElementById("energy").value,
-            "consumption": document.getElementById("consumption").value
+            "energy_price": document.getElementById("energy").value,
+            "power_consumption": document.getElementById("consumption").value
         }
+
+        console.log(body)
 
         const data = await apiCall(body, '/calculate', "POST")
         console.log(data)
@@ -203,14 +260,8 @@ async function submitForm() {
             $("#collapseOne").removeClass("show");
         }
 
-        if ($("#collapseTwo").hasClass("show")) {
-            $("#headingTwo").click();
-            $("#collapseTwo").removeClass("show");
-        }
-
         $("#resultAccordion").attr("hidden", false);
         $("#responseArea").html(data.coins_per_day[1]);
-
     }
 </script>
 

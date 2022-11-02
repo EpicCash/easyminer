@@ -1,10 +1,27 @@
-// Running Loop keeping alive connection with back-end
 
 // document.addEventListener('DOMContentLoaded', function () {
 //     keep_alive_server()
 //     try {setInterval(keep_alive_server, 5 * 1000)()
 //     } catch (error) {}
 // });
+
+
+function toast(icon='info', text='', timer=2000, timerProgressBar=false) {
+    const Toast = Swal.mixin({
+        toast: true,
+        showConfirmButton: true,
+        didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+    });
+    Toast.fire({
+        icon: icon,
+        text: text,
+        timer: timer,
+        timerProgressBar: timerProgressBar,
+    });
+};
 
 jQuery.fn.rotate = function(degrees) {
     $(this).css({'-webkit-transform' : 'rotate('+ degrees +'deg)',
@@ -33,7 +50,33 @@ $(document).ready(function(){
     });
 });
 
+// Return URL to flag .svg for given currency code
+function getFlagIcon(currencyCode) {
+    const currencyToCountry = {'GBP': 'gb', 'USD': 'us', 'EUR': 'eu', 'PLN': 'pl', 'CNY': 'cn'}
+    return `frontend/static/img/flags/${currencyToCountry[currencyCode]}.svg`
+}
 
+
+// Listen for currency select changes and manage flag icon
+$('#currencySelect').on('change', function() {
+    $('#flagIcon').attr('src', getFlagIcon(this.value))
+});
+
+
+// Listen for algorithm select changes, update units
+$('#algorithmSelect').on('change', function() {
+    const algoSettings = {
+        'progpow': {icon: 'sports_esports', units: 'MH/s'},
+        'randomx': {icon: 'memory', units: 'KH/s'},
+        'cuckoo': {icon: 'dns', units: 'GH/s'}
+        }
+
+    $('#algoIcon').text(algoSettings[this.value]['icon'])
+    $('#hashrateUnits').text(algoSettings[this.value]['units'])
+});
+
+
+// Running Loop keeping alive connection with back-end
 function keep_alive_server() {
     fetch(document.location + "keep-alive/?alive=true", {
         method: 'GET',

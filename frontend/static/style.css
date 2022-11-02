@@ -1,3 +1,16 @@
+
+.input-end {
+    width: 15%;
+    background-color: #EEEFED;
+    color: #353535
+}
+
+.input-start {
+    width: 30%;
+    background-color: #EEEFED;
+    color: #353535
+}
+
 .accordion-header {
     cursor: pointer;
 }
